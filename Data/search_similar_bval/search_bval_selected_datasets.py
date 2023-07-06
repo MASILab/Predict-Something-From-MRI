@@ -66,10 +66,8 @@ d = {'Dataset': list_df_dataset,
      'Path_PreQual': list_df_prequal,
      'bval': list_df_bval,
      'bval_unique': list_df_bval_unique}
-
-# Save the search results to csv
 df = pd.DataFrame(data=d)
-df.to_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Data/search_similar_bval/bval_search_all.csv', index=False)
+# df.to_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Data/search_similar_bval/bval_search_all.csv', index=False)
 
 # Count the number of samples acquired with the same bval
 list_type = []
@@ -81,5 +79,10 @@ for bval_unique in list_df_bval_unique:
         print('\nUnique bvalues: {}\n <Number of sessions using combination of these bvals>'.format(bval_unique))
         for dataset in selected_rows['Dataset'].unique():
             print('{}: {}'.format(dataset, len(selected_rows.loc[selected_rows['Dataset']==dataset, 'Session'].unique())))
+
+# Save the selected bval samples into csv
+selected_bval = [0, 700]
+df_selected = df[df['bval_unique'].apply(lambda x: x == selected_bval)]
+df_selected.to_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Data/search_similar_bval/bval_search_selected.csv', index=False)
 
 # pdb.set_trace()
