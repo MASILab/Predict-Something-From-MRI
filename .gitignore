@@ -1,3 +1,6 @@
+*.txt
+*.mat
+*.nii.gz
 *.csv
 *.png
 test.py
