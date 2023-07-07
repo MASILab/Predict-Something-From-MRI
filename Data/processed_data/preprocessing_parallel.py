@@ -1,3 +1,7 @@
+# Preprocess the collected data for the SPIE project.
+# Author: Chenyu Gao
+# Date: Jul 7, 2023
+
 import subprocess
 import multiprocessing
 import numpy as np
