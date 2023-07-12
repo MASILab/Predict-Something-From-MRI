@@ -11,6 +11,7 @@ import pandas as pd
 path_quality_check = Path('/home-local/Projects/PredictAge_QualityCheck/rater-1_offset-0_done')
 path_processed_data = Path('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Data/processed_data')
 
+list_df_dataset = []
 list_df_subject = []
 list_df_session = []
 list_df_sample = []
@@ -34,14 +35,17 @@ for dataset in path_quality_check.iterdir():
         
         if not (path_fa.is_file() and path_md.is_file()):
             print('Warning: file not existing', path_sample)
+            continue
         else:
+            list_df_dataset.append(dataset.name.replace('_done',''))
             list_df_subject.append(subject)
             list_df_session.append(session)
             list_df_sample.append(sample)
             list_df_fa.append(path_fa)
             list_df_md.append(path_md)
 
-d = {'Subject': list_df_subject,
+d = {'Dataset': list_df_dataset,
+     'Subject': list_df_subject,
      'Session': list_df_session,
      'Sample': list_df_sample,
      'Path_FA': list_df_fa,
