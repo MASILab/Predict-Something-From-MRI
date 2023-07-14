@@ -9,13 +9,14 @@ import numpy as np
 import pandas as pd
 
 SEED = 42
-TRAIN_RATIO = 0.93
+TRAIN_RATIO = 0.93  # this is not the final train/test ratio because we relocate data to prevent information leakage
 
 # The spreadsheet containing subject information and input image paths
 df = pd.read_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Data/demog_info/data_all_with_subject_info.csv')
 
 # Drop rows with NaN values
 df.dropna(axis=0, inplace=True)
+print(df)
 
 # Training and testing set
 list_subjects_healthy_train = []
@@ -63,6 +64,11 @@ print('There is no overlapping subject between Train and Test.\n'
           ))
 
 # Save splitting to csv
-df[df['Subject'].isin(list_subjects_healthy_train)].to_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Data/train_test_split/train.csv', index=False)
-df[df['Subject'].isin(list_subjects_healthy_test)].to_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Data/train_test_split/test_healthy.csv', index=False)
-df[df['Subject'].isin(list_subjects_impaired_test)].to_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Data/train_test_split/test_impaired.csv', index=False)
+df_train = df[(df['Subject'].isin(list_subjects_healthy_train))&(df['Diagnosis']=='normal')]
+df_train.to_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Data/train_test_split/train.csv', index=False)
+
+df_test_healthy = df[(df['Subject'].isin(list_subjects_healthy_test))&(df['Diagnosis']=='normal')]
+df_test_healthy.to_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Data/train_test_split/test_healthy.csv', index=False)
+
+df_test_impaired = df[(df['Subject'].isin(list_subjects_impaired_test))&(df['Diagnosis']!='normal')]
+df_test_impaired.to_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Data/train_test_split/test_impaired.csv', index=False)

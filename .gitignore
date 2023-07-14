@@ -4,6 +4,8 @@
 *.csv
 *.png
 test.py
+Data/processed_data
+Data/demog_info/raw/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
