@@ -7,6 +7,7 @@
 test.py
 Data/processed_data
 Data/demog_info/raw/
+Experiment/model_resnet/runs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
