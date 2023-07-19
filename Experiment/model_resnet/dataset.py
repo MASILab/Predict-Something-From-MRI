@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
-from monai.transforms import Compose, LoadImaged, AddChanneld, ToTensord, EnsureChannelFirstd
+from monai.transforms import Compose, LoadImaged, AddChanneld, ToTensord, EnsureChannelFirstd, ResizeD
 import pandas as pd
 import numpy as np
 import random
@@ -34,6 +34,7 @@ class AgePredictionDataset(Dataset):
         transform = Compose([
             LoadImaged(keys=['fa', 'md'], image_only=True),
             EnsureChannelFirstd(keys=['fa', 'md']),
+            ResizeD(keys=['fa', 'md'], spatial_size=(128, 128, 128), mode='area'),
             ToTensord(keys=['fa', 'md'])
         ])
         data_dict = {'fa': img_fa, 'md': img_md}

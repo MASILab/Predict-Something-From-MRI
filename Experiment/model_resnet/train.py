@@ -3,6 +3,7 @@ import torch
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from tqdm import tqdm
 from dataset import AgePredictionDataset
 from models import resnet10_noMLP
 from torch.utils.data import DataLoader
@@ -26,7 +27,6 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size, default to 8")
     args = parser.parse_args()
 
-    # TODO:
     num_epochs = args.num_epochs
     batch_size = args.batch_size
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -66,7 +66,7 @@ if __name__ == "__main__":
         for epoch in range(num_epochs):
             model.train()
             epoch_loss = 0.0
-            for fa, md, sex, age in dataloader_train:                
+            for fa, md, sex, age in tqdm(dataloader_train):                
                 fa, md, sex, age = fa.to(device), md.to(device), sex.to(device), age.to(device)
                 
                 input_img = torch.cat((fa,md), dim=1)
@@ -99,6 +99,8 @@ if __name__ == "__main__":
             val_loss = val_loss / len(dataloader_val)
             writer.add_scalar('Val/Loss', val_loss, epoch)
 
+            print("Epoch: {}\tTrain Loss: {}\tValidation Loss: {}".format(epoch, epoch_loss, val_loss))
+            
             # Check if this model is the best so far
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
