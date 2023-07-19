@@ -42,4 +42,4 @@ for csv in list_dataset_csv:
         
         df_move.loc[idx, 'dir'] = target_dir
     
-    df_move.to_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Experiment/model_resnet/data/{}'.format(csv.name))
+    df_move.to_csv('/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Experiment/model_resnet/data/{}'.format(csv.name), index=False)
