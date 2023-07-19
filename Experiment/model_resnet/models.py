@@ -306,7 +306,7 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
 
-def forward(self, x: torch.Tensor, x_scalar: torch.Tensor | None = None) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, x_scalar: torch.Tensor | None = None) -> torch.Tensor:
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
