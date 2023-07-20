@@ -79,7 +79,7 @@ if __name__ == "__main__":
                 input_img = torch.cat((fa,md), dim=1)
                 optimizer.zero_grad()
                 output = model(input_img, sex)
-                loss = loss_fn(output.squeeze(), age)
+                loss = loss_fn(output, age.view(-1, 1))
                 
                 loss.backward()
                 optimizer.step()
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
                     input_img_val = torch.cat((fa_val,md_val), dim=1)
                     output_val = model(input_img_val, sex_val)
-                    loss_val = loss_fn(output_val.squeeze(), age_val)
+                    loss_val = loss_fn(output_val, age_val.view(-1, 1))
                     
                     val_loss += loss_val.item()
 
