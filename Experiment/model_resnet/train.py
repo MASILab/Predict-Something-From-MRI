@@ -1,11 +1,12 @@
 import argparse
 import torch
+import subprocess
 import numpy as np
 import pandas as pd
 from pathlib import Path
 from tqdm import tqdm
 from dataset import AgePredictionDataset
-from models import resnet10_noMLP
+from models import *
 from torch.utils.data import DataLoader
 from torch.optim import lr_scheduler
 from torch.utils.tensorboard import SummaryWriter
@@ -15,6 +16,9 @@ def select_model(model_name):
     if model_name == 'resnet10_noMLP':
         print('Loading {}'.format(model_name))
         return resnet10_noMLP()
+    elif model_name == 'resnet10_MLP_64':
+        print('Loading {}'.format(model_name))
+        return resnet10_MLP_64()
     else:
         print('Model not found. Please see models.py for the full list of models')
 
@@ -25,6 +29,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default='resnet10_noMLP', help="Name of the model, see models.py for the full list of models")
     parser.add_argument("--num_epochs", type=int, default=100, help="Number of epochs, default to 100")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size, default to 8")
+    parser.add_argument("--model_save_dir", type=str, default='/home-local/Projects/Predict_Age_Models', help="Directory to save the model weights, default to /home-local/Projects/Predict_Age_Models")
     args = parser.parse_args()
 
     num_epochs = args.num_epochs
@@ -55,12 +60,14 @@ if __name__ == "__main__":
         
         # TODO: think more on this block, there are many options
         model = select_model(args.model_name).to(device)
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
-        scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[20,60], gamma=0.5, last_epoch=-1, verbose=True)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
+        scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[2, 6, 14, 30], gamma=0.2, last_epoch=-1, verbose=True)
         loss_fn = torch.nn.MSELoss()
 
         best_val_loss = float('inf')
-        save_path = "/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Experiment/model_resnet/weights/{}/model_fold-{}.pth".format(args.model_name, fold_idx)
+        model_save_dir = Path(args.model_save_dir) / args.model_name / "fold-{}".format(fold_idx)
+        if not model_save_dir.is_dir():
+            subprocess.run(['mkdir', '-p', model_save_dir])
         
         # print(sum(torch.numel(param) for param in model.parameters()))
         for epoch in range(num_epochs):
@@ -104,6 +111,7 @@ if __name__ == "__main__":
             # Check if this model is the best so far
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
+                save_path = model_save_dir / "model_fold-{}_epoch-{}.pth".format(fold_idx, epoch)
                 torch.save(model.state_dict(), save_path)
                 print(f'Saved improved model to {save_path} at epoch {epoch} with validation loss {best_val_loss}')
 
