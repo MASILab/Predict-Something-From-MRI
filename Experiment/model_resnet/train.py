@@ -19,6 +19,9 @@ def select_model(model_name):
     elif model_name == 'resnet10_MLP_64':
         print('Loading {}'.format(model_name))
         return resnet10_MLP_64()
+    elif model_name == 'resnet18_noMLP':
+        print('Loading {}'.format(model_name))
+        return resnet18_noMLP()
     else:
         print('Model not found. Please see models.py for the full list of models')
 
@@ -28,8 +31,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name", type=str, default='resnet10_noMLP', help="Name of the model, see models.py for the full list of models")
     parser.add_argument("--fold", nargs='+', type=int, default=[1,2,3,4,5], help="Fold(s) to train, e.g.'--fold 1 2 3 4 5', default to 1 2 3 4 5")
-    parser.add_argument("--num_epochs", type=int, default=100, help="Number of epochs, default to 100")
-    parser.add_argument("--batch_size", type=int, default=8, help="Batch size, default to 8")
+    parser.add_argument("--num_epochs", type=int, default=30, help="Number of epochs, default to 30")
+    parser.add_argument("--batch_size", type=int, default=2, help="Batch size for the dataloader, default to 2")
+    parser.add_argument("--bsize_factor", type=int, default=2, help="Update weights for every other bsize_factor batch to mimic larger batchsize, default to 2")
     parser.add_argument("--model_save_dir", type=str, default='/home-local/Projects/Predict_Age_Models', help="Directory to save the model weights, default to /home-local/Projects/Predict_Age_Models")
     args = parser.parse_args()
 
@@ -61,8 +65,8 @@ if __name__ == "__main__":
         
         # TODO: think more on this block, there are many options
         model = select_model(args.model_name).to(device, non_blocking=True)
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
-        scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[2, 6, 14, 30], gamma=0.2, last_epoch=-1, verbose=True)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)  # 0.0005, 0.00025, 0.000125, 0.0000625, 0.00003125, 0.000015625...
+        scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[5, 10, 15, 20, 25], gamma=0.5, last_epoch=-1, verbose=True)
         loss_fn = torch.nn.MSELoss()
 
         best_val_loss = float('inf')
@@ -73,19 +77,22 @@ if __name__ == "__main__":
         for epoch in range(num_epochs):
             model.train()
             epoch_loss = 0.0
-            for fa, md, sex, age in tqdm(dataloader_train):                
+            optimizer.zero_grad()
+            for i, (fa, md, sex, age) in enumerate(tqdm(dataloader_train)):
                 fa, md, sex, age = fa.to(device, non_blocking=True), md.to(device, non_blocking=True), sex.to(device, non_blocking=True), age.to(device, non_blocking=True)
                 input_img = torch.cat((fa,md), dim=1)
                 
-                optimizer.zero_grad()
-
-                with torch.autocast():
+                with torch.autocast('cuda'):
                     output = model(input_img, sex)
                     loss = loss_fn(output, age.view(-1, 1))
-                
+                    epoch_loss += loss.item()
+
+                loss /= args.bsize_factor
                 loss.backward()
-                optimizer.step()
-                epoch_loss += loss.item()
+
+                if (i+1) % args.bsize_factor == 0 or (i+1) == len(dataloader_train):
+                    optimizer.step()
+                    optimizer.zero_grad()
 
             scheduler.step()
             

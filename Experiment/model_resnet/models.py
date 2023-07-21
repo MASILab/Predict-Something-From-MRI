@@ -23,6 +23,7 @@ __all__ = [
     "ResNetBottleneck",
     "resnet10_noMLP",
     "resnet10_MLP_64",
+    "resnet18_noMLP"
 ]
 
 def get_inplanes():
@@ -358,3 +359,13 @@ def resnet10_MLP_64():
     )
     return model
 
+def resnet18_noMLP():
+    model = ResNet(block=ResNetBlock,
+                   layers=[2, 2, 2, 2],
+                   block_inplanes=get_inplanes(),
+                   n_input_channels=2,
+                   num_classes=1,
+                   scalar_input_num=1,
+                   MLP_hidden_layer_sizes=None
+    )
+    return model
