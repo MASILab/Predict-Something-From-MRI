@@ -10,7 +10,6 @@ from models import *
 from torch.utils.data import DataLoader
 from torch.optim import lr_scheduler
 from torch.utils.tensorboard import SummaryWriter
-writer = SummaryWriter()
 
 def select_model(model_name):
     if model_name == 'resnet10_noMLP':
@@ -24,7 +23,6 @@ def select_model(model_name):
         return resnet18_noMLP()
     else:
         print('Model not found. Please see models.py for the full list of models')
-
 
 if __name__ == "__main__":
     # user inputs
@@ -47,6 +45,9 @@ if __name__ == "__main__":
     df = pd.read_csv(train_csv)
 
     for fold_idx in args.fold:
+        
+        # tensorboard
+        writer = SummaryWriter(log_dir="runs/{}_fold-{}".format(args.model_name, fold_idx))
 
         # subject-level splitting
         subjects_train = np.load((datasplit_folder/'train_subjects_t_fold_{}.npy'.format(fold_idx)), allow_pickle=True)
@@ -65,8 +66,12 @@ if __name__ == "__main__":
         
         # TODO: think more on this block, there are many options
         model = select_model(args.model_name).to(device, non_blocking=True)
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)  # 0.0005, 0.00025, 0.000125, 0.0000625, 0.00003125, 0.000015625...
-        scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[5, 10, 15, 20, 25], gamma=0.5, last_epoch=-1, verbose=True)
+        optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+        scheduler = lr_scheduler.OneCycleLR(optimizer,
+                                            max_lr=1e-3, 
+                                            epochs=num_epochs,
+                                            steps_per_epoch=round(len(dataset_train)/args.bsize_factor), 
+                                            cycle_momentum=True)
         loss_fn = torch.nn.MSELoss()
 
         best_val_loss = float('inf')
@@ -93,8 +98,7 @@ if __name__ == "__main__":
                 if (i+1) % args.bsize_factor == 0 or (i+1) == len(dataloader_train):
                     optimizer.step()
                     optimizer.zero_grad()
-
-            scheduler.step()
+                    scheduler.step()
             
             epoch_loss = epoch_loss / len(dataloader_train)
             writer.add_scalar('Train/Loss', epoch_loss, epoch)
@@ -120,8 +124,8 @@ if __name__ == "__main__":
             # Check if this model is the best so far
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
-                save_path = model_save_dir / "model_fold-{}_epoch-{}.pth".format(fold_idx, epoch)
+                save_path = model_save_dir / f"model_fold-{fold_idx}_epoch-{epoch}_valloss-{best_val_loss:.4f}.pth"
                 torch.save(model.state_dict(), save_path)
                 print(f'Saved improved model to {save_path} at epoch {epoch} with validation loss {best_val_loss}')
 
-writer.close()
+        writer.close()
