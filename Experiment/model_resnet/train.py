@@ -70,7 +70,7 @@ if __name__ == "__main__":
         scheduler = lr_scheduler.OneCycleLR(optimizer,
                                             max_lr=1e-3, 
                                             epochs=num_epochs,
-                                            steps_per_epoch=round(len(dataset_train)/args.bsize_factor), 
+                                            steps_per_epoch=round(len(dataset_train)/(batch_size*args.bsize_factor)), 
                                             cycle_momentum=True)
         loss_fn = torch.nn.MSELoss()
 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
                     optimizer.step()
                     optimizer.zero_grad()
                     scheduler.step()
-            
+                    
             epoch_loss = epoch_loss / len(dataloader_train)
             writer.add_scalar('Train/Loss', epoch_loss, epoch)
                 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
             val_loss = val_loss / len(dataloader_val)
             writer.add_scalar('Val/Loss', val_loss, epoch)
 
-            print("Epoch: {}\tTrain Loss: {}\tValidation Loss: {}".format(epoch, epoch_loss, val_loss))
+            print("Epoch: {}\tCurrent LR: {}\tTrain Loss: {}\tValidation Loss: {}".format(epoch, scheduler.get_last_lr(), epoch_loss, val_loss))
             
             # Check if this model is the best so far
             if val_loss < best_val_loss:
