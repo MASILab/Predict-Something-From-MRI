@@ -21,6 +21,9 @@ def select_model(model_name):
     elif model_name == 'resnet18_noMLP':
         print('Loading {}'.format(model_name))
         return resnet18_noMLP()
+    elif model_name == 'resnet18_MLP_64':
+        print('Loading {}'.format(model_name))  
+        return resnet18_MLP_64()
     else:
         print('Model not found. Please see models.py for the full list of models')
 
@@ -60,7 +63,7 @@ if __name__ == "__main__":
         dataset_val = AgePredictionDataset(df_val)
         
         dataloader_train = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
-        dataloader_val = DataLoader(dataset_val, batch_size=batch_size*2, shuffle=False, num_workers=4, pin_memory=True)
+        dataloader_val = DataLoader(dataset_val, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True)
 
         print("Start fold-{}\nTraining set:\n{}\nValidation set:\n{}\n".format(fold_idx, df_train, df_val))
         
