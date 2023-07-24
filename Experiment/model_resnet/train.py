@@ -24,6 +24,12 @@ def select_model(model_name):
     elif model_name == 'resnet18_MLP_64':
         print('Loading {}'.format(model_name))  
         return resnet18_MLP_64()
+    elif model_name == 'resnet34_noMLP':
+        print('Loading {}'.format(model_name))  
+        return resnet34_noMLP()
+    elif model_name == 'resnet34_MLP_64':
+        print('Loading {}'.format(model_name))
+        return resnet34_MLP_64()
     else:
         print('Model not found. Please see models.py for the full list of models')
 
