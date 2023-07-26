@@ -1,4 +1,5 @@
 # After running final_testing.py, summarize the model performances.
+# Calculate the metrics cross-sectionally.
 # 
 # Author: Chenyu Gao
 # Date: Jul 26, 2023
@@ -13,9 +14,19 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 def compute_metrics(path_csv):
+    """Compute the metrics cross-sectionally
+
+    Args:
+        path_csv (str or pathlib): path to the csv
+    """
     df = pd.read_csv(path_csv)
-    mse = mean_squared_error(df['Age_gt'], df['Age_predicted'])
-    mae = mean_absolute_error(df['Age_gt'], df['Age_predicted'])
+    
+    # Pick only one sample from each subject 
+    # at youngest age (for consistency across models in the same fold)
+    df_one = df.loc[df.groupby('Subject')['Age'].idxmin()]
+    
+    mse = mean_squared_error(df_one['Age_gt'], df_one['Age_predicted'])
+    mae = mean_absolute_error(df_one['Age_gt'], df_one['Age_predicted'])
     return mse, mae
 
 # Dir of the spreadsheets
