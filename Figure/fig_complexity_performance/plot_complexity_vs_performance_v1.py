@@ -86,8 +86,8 @@ for x in range(1,5):
 fold_labels = [f"fold-{i}" for i in df['Fold'].unique()]
 ax.set_xticks(df['Fold'].unique())
 ax.set_xticklabels(fold_labels, fontsize=fontsize_txt)
-ax.set_xlabel('5-Fold Cross Validation', fontsize=fontsize_label)
-ax.set_ylabel('Mean Squared Error on Validation Set', fontsize=fontsize_label)
+ax.set_xlabel('5-fold cross validation', fontsize=fontsize_label)
+ax.set_ylabel('Mean squared error on validation set (year$^2$)', fontsize=fontsize_label)
 legend = ax.legend(title='Model', loc='upper left', bbox_to_anchor=(1, 1.02), handleheight=6.3)
 legend.set_title('Model', prop={'size': fontsize_label})  # Adjust fontsize here
 for text in legend.get_texts():
