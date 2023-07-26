@@ -43,12 +43,14 @@ for i, diagnosis in enumerate(['normal', 'impaired (not MCI)', 'MCI', 'dementia'
                 cut=1,
                 alpha=.95,
                 ax=axes[i//2, i%2])
-
-    axes[i//2, i%2].set_xlabel('Chronological age (year)')
-    axes[i//2, i%2].set_ylabel('Predicted - chronological age (year)')
+    axes[i//2, i%2].axhline(y=0,linestyle='--',linewidth=1, color='k', alpha=0.25)
+    
+    axes[i//2, i%2].set_xlabel('Chronological age (year)', fontsize=10)
+    axes[i//2, i%2].set_ylabel('Predicted - chronological age (year)', fontsize=10)
     
     axes[i//2, i%2].text(0.04, 0.96, 
                          f"{dict_rename[diagnosis]}", 
+                         fontsize=10,
                          transform=axes[i//2, i%2].transAxes,
                          verticalalignment='top', 
                          bbox=dict(facecolor='white', alpha=0.8, edgecolor='black'))
