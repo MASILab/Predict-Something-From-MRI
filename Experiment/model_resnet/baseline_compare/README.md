@@ -1,0 +1,5 @@
+Previously we built a baseline model for brain age prediction. It uses the mean/std values of FA and MD extracted from brain regions as the inputs, and a shallow MLP to perform regression. The experiment is documented in the notebook: `/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Experiment/model_baseline_ROI-based-measure/baseline_model_regression.ipynb`
+
+And the code used to extract ROI-based features: `/nfs/masi/gaoc11/projects/Predict-Something-From-MRI/Experiment/model_baseline_ROI-based-measure/extract_ROI_std_mean.py`
+
+Now we want to compare our 3D ResNet models with that baseline model. To do that, we need to re-train the baseline model with the exact same data, and the exact same splitting of the 5 folds. Also, we need to test the performance using the exact same testing sets (same samples from subjects) for fair comparison.
