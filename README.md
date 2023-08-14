@@ -19,8 +19,8 @@ Studies have attempted to leverage the advantages of diffusion tensor imaging (D
     - `toy_regression_spreadsheet`: generate a spreadsheet for building and testing toy machine learning models for age prediction using feature-based method
     - `train_test_split`: split the dataset on subject-level
 - `~/Experiment`:
-    - `model_baseline_ROI-based-measure`: ROI-based feature engineering method (top in the [figure](#Abstract))
-    - `model_resnet`: 3D residual neural network (bottom in the [figure](#Abstract))
+    - `model_baseline_ROI-based-measure`: ROI-based feature engineering method (top in the [figure](#abstract))
+    - `model_resnet`: 3D residual neural network (bottom in the [figure](#abstract))
     - `test_preprocessing`: script to test the preprocessing code
     - `toy_regression`: toy experiments to play with simple machine learning algorithms for regression
 - `~/Figure`: generate figures for analysis and discussion
