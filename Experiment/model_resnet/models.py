@@ -247,8 +247,8 @@ class ResNet(nn.Module):
             for mlp_hidden_layer_size in MLP_hidden_layer_sizes:
                 MLP_layers.append(nn.Linear(MLP_input_size, mlp_hidden_layer_size))
                 MLP_layers.append(nn.ReLU())
-                input_size = mlp_hidden_layer_size
-            MLP_layers.append(nn.Linear(input_size, num_classes))
+                MLP_input_size = mlp_hidden_layer_size
+            MLP_layers.append(nn.Linear(MLP_input_size, num_classes))
             self.mlp = nn.Sequential(*MLP_layers)
 
         for m in self.modules():
